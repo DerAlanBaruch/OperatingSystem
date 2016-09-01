@@ -5,110 +5,114 @@
 #include <sys/wait.h>
 
 void TreeProcess ( );
-void FirstChild ( int nLevels );
-void SecondChild ( int nLevels );
+void nLevelConstructor ( int processNumber, int nLevels, int counter );
+void spaces ( int counter );
 
-int main ( ) {
+static const int mainChilds = 2; /* Stores the number of the direct childs of main process. */
+static const int leftChilds = 3; /* Stores the number of left childs per level. */
+static const int rightChilds = 4; /* Stores the number of rigtht childs per level. */
+static int selection = 0;
 
-  TreeProcess ( );
+int main ( ) { TreeProcess ( ); } /* End of the main. */
 
-} /* End of main. */
+void TreeProcess ( ) {
 
-void TreeProcess ( ) { /* Contruct the main two process childs. */
-
-  int idProcess; /* Stores the return variable of the fork. */
-  int status = 0; /* Status of the process. */
-  int nLevels; /* Establish the number of levels of the tree process. */
-  int chooseLevels = 0; /* Variable that will help the user to choose only ones the number of levels at the standar input. */
+  int idProcess; /* Stores the return value of fork. */
+  int nLevels; /* Variable that will store the levels of the tree. */
+  int processNumber;
   int counter = 0;
+  int secondCounter = 0;
 
-  if ( chooseLevels == 0 ) {
+  if ( selection == 0 ) {
     printf ( "\n\n\t\tOPERATING SYSTEMS: TREE OF PROCESS." );
-    printf ( "\n\n\tAdd the number of levels for this process: " );
+    printf ( "\n\n\tAdd the number of levels of the tree process: " );
     scanf ( "%d", &nLevels );
-    chooseLevels++;
-  } /* End of the if. */
+    selection++;
+  } /* End of if. */
 
-  for ( counter = 0 ; counter < 2 ; counter++ ) { /* We only need two childs of the main process. */
-    idProcess = fork ( ); /* Creates a copy of the main process. */
+  for ( counter = 0 ; counter < mainChilds ; counter++ ) { /* Controls the number of main childs. */
+    idProcess = fork ( );
     switch ( idProcess ) {
-      case 0:
-        if ( counter == 0 ) { /* For the first child of the main process. */
-          printf ( "\n\tFirst child of the main process: %d.", getpid ( ) );
-          printf ( "\tThe parent id is: %d.\n", getppid ( ) );
-          FirstChild ( nLevels );
-        } /* End of the if. */
-        if ( counter == 1 ) { /* For the second child of the main process. */
-          printf ( "\n\n\tSecond child of the main process: %d.", getpid ( ) );
-          printf ( "\tThe parent id is: %d.\n", getppid ( ) );
-          SecondChild ( nLevels );
-        } /* End of the if. */
+      case 0: /* Fork return a value = 0, if the id it's of child. */
+        if ( counter == 0 ) { /* First child of main parent. */
+          printf ( "\n\tFirst child of the main process: %d.", getpid ( ) ); /* Getpid returns the value of the child process. */
+          printf ( "\tThe parent id is: %d.\n", getppid ( ) ); /* Getppid returns the id of the direct parent of the process. */
+          counter++;
+          processNumber = leftChilds;
+        } else if ( counter == 1 ) { /* Second child of main process. */
+          printf ( "\n\tSecond child of the main process: %d.", getpid ( ) ); /* Getpid returns the value of the child process. */
+          printf ( "\tThe parent id is: %d.\n", getppid ( ) ); /* Getppid returns the id of the direct parent of the process. */
+          processNumber = rightChilds;
+          counter++;
+        } /* End of the if - else. */
+        nLevelConstructor ( processNumber, nLevels, 1 );
         exit ( 0 );
-      case -1:
-        printf ( "\n\tError creating new process." );
-        exit ( 0 );
-      default:
-        if ( counter == 0 ) { /* For the id of the main parent process. */
-          printf ( "\n\tMain parent process: %d.\n", getpid ( ) ); /* getpid, for the main parent, because the parent of the main process it's the shell. */
+        break;
+      case -1: /* Fork return a value = -1, if've been a error creating a new process. */
+        printf ( "\n\tError creating a new process." );
+        break;
+      default: /* Fork return a value > 0, for the parent process. */
+        if ( counter == 0 ) {
+          printf ( "\n\tMain parent process: %d.\n", getpid ( ) ); /* Main parent process it's also a child of the shell process. */
+        } /* End of if. */
+        if ( counter == 1 ) {
+          while ( secondCounter < 2 ) { /* Execute wait the same times of the number of child process of the parent. */
+            wait ( 0 ); /* The main parent process will "wait", until his childs process finishes the execution. */
+            secondCounter++;
+          } /* End of the while. */
         } /* End of the if. */
-        wait ( &status ); /* wait for the end of childs process. */
+        break;
+        printf ( "\n" );
     } /* End of switch. */
   } /* End of the For. */
 
   printf ( "\n\n" );
 
-} /* End of TreeProcess Function. */
+} /* End of TreeProcess function. */
 
-void FirstChild ( int nLevels ) { /* COntruct the levels of the main first child. */
+void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Creates the levels of the tree process. */
 
-  int processCounter = 0;
+	int idProcess;
   int status = 0;
-  int idProcess; /* Stores the return variable of the fork. */
+  int secondCounter = 0;
 
-  for ( processCounter = 0 ; processCounter < 3 ; processCounter++ ) { /* Controls the number of childs per level. */
+	for ( secondCounter = 0 ; secondCounter < processNumber ; secondCounter++ ) { /* Construct the levels of the main childs. */
     idProcess = fork ( );
     switch ( idProcess ) {
-      case 0:
-        printf ( "\n\tChild process id: %d.", getpid ( ) );
-        printf ( "\tParent id: %d.", getppid ( ) );
-        if ( nLevels > 1 ) {
-          FirstChild ( nLevels - 1 ); /* Recursive function that controls the tree levels. */
-        } /* End of the if. */
-        exit ( 0 );
       case -1:
-        printf ( "\n\n\tError creating new process." );
-        exit ( 0 );
-      default:
-        wait ( &status );
-        break;
-    } /* End of the switch. */
-  } /* End of the For. */
-
-} /* End of FirstChild Function. */
-
-void SecondChild ( int nLevels ) { /* Construct the levels of the main second child. */
-
-  int processCounter = 0;
-  int status = 0;
-  int idProcess; /* Stores the return variable of the fork. */
-
-  for ( processCounter = 0 ; processCounter < 4 ; processCounter++ ) { /* Controls the number of childs per level. */
-    idProcess = fork ( );
-    switch ( idProcess ) {
-      case 0:
+        spaces ( counter );
+        printf ( "\n\tError creating new process in level: %d\n", counter );
+        exit ( -1 );
+		    break;
+			case 0:
+	      spaces ( counter );
         printf ( "\n\tChild process id: %d.", getpid ( ) );
-        printf ( "\tParent id: %d.", getppid ( ) );
-        if ( nLevels > 1 ) {
-          SecondChild ( nLevels - 1 ); /* Recursive function that controls the tree levels. */
-        } /* End of the if. */
-        exit ( 0 );
-      case -1:
-        printf ( "\n\n\tError creating new process." );
-        exit ( 0 );
-      default:
-        wait ( &status );
-        break;
-    } /* End of the switch. */
-  } /* End of the For. */
+        printf ( "\tParent id: %d. Level: %d.", getppid ( ), counter );
+				if ( nLevels > 1 ) { /* Condition for the recursive function. */
+          nLevelConstructor ( processNumber, nLevels - 1, counter + 1 );
+				} /* End of the if. */
+				exit ( 0 );
+				break;
+			default:
+				if( secondCounter == ( processNumber -1 ) ) {
+          spaces ( counter );
+					while ( status < processNumber ) { /* Execute wait the same times of the number of child process of the parent. */
+						wait ( NULL );
+						status++;
+					} /* End of the while. */
+				} /* End of the if. */
+				break;
+		} /* End of the switch. */
+	} /* End of the For. */
 
-} /* End of the SecondChild Function. */
+} /* End of nLevelConstructor function. */
+
+void spaces ( int counter ) {
+
+  int secondCounter = 0;
+
+	for ( secondCounter = 0 ; secondCounter < counter ; secondCounter++ ) {
+		printf ( "\t" );
+	} /* End of the For. */
+
+} /* End of spaces function. */

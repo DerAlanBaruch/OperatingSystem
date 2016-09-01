@@ -70,7 +70,7 @@ void TreeProcess ( ) {
 
 } /* End of TreeProcess function. */
 
-void nLevelConstructor ( int processNumber, int nLevels, intcounter ) { /* Creates the levels of the tree process. */
+void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Creates the levels of the tree process. */
 
   int idProcess;
   int status = 0;

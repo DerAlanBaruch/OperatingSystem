@@ -70,36 +70,36 @@ void TreeProcess ( ) {
 
 } /* End of TreeProcess function. */
 
-void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Creates the levels of the tree process. */
+void nLevelConstructor ( int processNumber, int nLevels, intcounter ) { /* Creates the levels of the tree process. */
 
-	int idProcess;
+  int idProcess;
   int status = 0;
   int secondCounter = 0;
 
-	for ( secondCounter = 0 ; secondCounter < processNumber ; secondCounter++ ) { /* Construct the levels of the main childs. */
+  for ( secondCounter = 0 ; secondCounter < processNumber ; secondCounter ++ ) { /* Controls the loop of the tree. */
     idProcess = fork ( );
     switch ( idProcess ) {
       case -1:
-        printf ( "\n\tError creating new process in level: %d\n", counter );
+        printf ( "\n\tError creating new process in level: %d.\n", counter );
         exit ( -1 );
-		    break;
-			case 0:
+        break;
+      case 0:
         printf ( "\n\tChild process id: %d.", getpid ( ) );
         printf ( "\tParent id: %d. Level: %d.", getppid ( ), counter );
-				if ( nLevels > 1 ) { /* Condition for the recursive function. */
-          nLevelConstructor ( processNumber, nLevels - 1, counter + 1 );
-				} /* End of the if. */
-				exit ( 0 );
-				break;
-			default:
-				if( secondCounter == ( processNumber -1 ) ) {
-					while ( status < processNumber ) { /* Execute wait the same times of the number of child process of the parent. */
-						wait ( NULL );
-						status++;
-					} /* End of the while. */
-				} /* End of the if. */
-				break;
-		} /* End of the switch. */
-	} /* End of the For. */
+        if ( nLevels > 1 ) { /* Condition for the recursive function. */
+          nLevelConstructor ( processNumber, nLevels - 1, counter + 1 ); /* Recursion. */
+        } /* End of the if. */
+        exit ( 0 );
+        break;
+      default:
+      if ( secondCounter == ( processNumber - 1 ) ) {
+        while ( status < processNumber ) {
+          wait ( NULL );
+          status++;
+        } /* End of the while. */
+      } /* End of the if. */
+      break;
+    } /* End of the switch. */
+  } /* End of the For. */
 
 } /* End of nLevelConstructor function. */

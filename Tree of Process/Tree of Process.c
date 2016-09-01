@@ -80,12 +80,10 @@ void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Crea
     idProcess = fork ( );
     switch ( idProcess ) {
       case -1:
-        spaces ( counter );
         printf ( "\n\tError creating new process in level: %d\n", counter );
         exit ( -1 );
 		    break;
 			case 0:
-	      spaces ( counter );
         printf ( "\n\tChild process id: %d.", getpid ( ) );
         printf ( "\tParent id: %d. Level: %d.", getppid ( ), counter );
 				if ( nLevels > 1 ) { /* Condition for the recursive function. */
@@ -95,7 +93,6 @@ void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Crea
 				break;
 			default:
 				if( secondCounter == ( processNumber -1 ) ) {
-          spaces ( counter );
 					while ( status < processNumber ) { /* Execute wait the same times of the number of child process of the parent. */
 						wait ( NULL );
 						status++;
@@ -106,13 +103,3 @@ void nLevelConstructor ( int processNumber, int nLevels, int counter ) { /* Crea
 	} /* End of the For. */
 
 } /* End of nLevelConstructor function. */
-
-void spaces ( int counter ) {
-
-  int secondCounter = 0;
-
-	for ( secondCounter = 0 ; secondCounter < counter ; secondCounter++ ) {
-		printf ( "\t" );
-	} /* End of the For. */
-
-} /* End of spaces function. */

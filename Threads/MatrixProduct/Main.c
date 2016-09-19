@@ -18,14 +18,14 @@ int main ( ) {
 		matrixProduct [ counter ] = ( int * ) malloc ( ( Parameters.size ) * ( sizeof ( int ) ) ); /* Access to the input array and reserve memory for an integer. */
 		argument [ counter ] = counter;
 	} /* End of for. */
-	
+
 	ConstructMatrix ( answer );
 
 	pthread_t Thread [ Parameters.size ];
 
-  for ( counter = 0 ; counter < Parameters.size ; counter++ ) { /* Create the threads to use. */
-  	pthread_create ( &Thread [ counter ], NULL, ( void * ) ThreadProduct, ( void * ) &argument [ counter ] );
-  } /* End of the for. */
+	for ( counter = 0 ; counter < Parameters.size ; counter++ ) { /* Create the threads to use. */
+		pthread_create ( &Thread [ counter ], NULL, ( void * ) ThreadProduct, ( void * ) &argument [ counter ] );
+	} /* End of the for. */
 
 	printf ( "\n\tResulting matrix: " );
 
